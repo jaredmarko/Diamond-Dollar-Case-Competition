@@ -1,60 +1,108 @@
-# Diamond Dollar Case Competition: Relief Pitcher Valuation
+# Relief Pitcher Valuation: Diamond Dollars 2025
 
-## Overview
+## 🧠 Summary
 
-This repository contains the code and analysis for our Diamond Dollar Case Competition submission, presented at the SABR Analytics Conference. Our project focuses on evaluating MLB relief pitchers by developing two novel metrics: **Save Score** and **Reliever Impact Score (RIS)**. Using Statcast, FanGraphs, and Baseball-Reference data from 2023-2024, we quantify reliever effectiveness beyond traditional saves, incorporating context-adjusted factors like inherited runners, hitter quality, and leverage. Our analysis identifies under- and over-appreciated closers, ranks top relievers, and provides actionable insights for teams to optimize bullpen management.
+This project was created for the 2025 SABR Diamond Dollars Case Competition and introduces two custom metrics to evaluate MLB relievers:
 
-### Authors
-- David Baitt
-- Owen Lefkowicz
-- William Haray
-- Jared Markowitz
-- Andrew Fossi
+- **Save Score**: A context-adjusted performance metric for closers based on leverage, opponent quality, and Win Probability Added (WPA).
+- **RIS (Reliever Impact Score)**: A skill-based rating system optimized via regression on underlying indicators like SIERA, strikeout rate, and xwOBA.
 
-## Project Structure
+---
 
-- **`DiamondDollarCaseCompetition.ipynb`**: The main Jupyter Notebook containing the full analysis, including data collection, cleaning, metric computation, ranking, and visualizations.
-- **`data/`** (optional): A folder containing CSV files (`bref_2023.csv`, `bref_2024.csv`) with Baseball-Reference relief pitching data. *Note*: These files are required to run the notebook unless sourced directly.
-- **Output Visuals**:
-  - `misvaluation_plot.png`: Scatter plot of Saves vs. Save Score, colored by RIS.
-  - `radar_chart.png`: Radar chart of the top reliever’s performance profile.
-  - `ris_save_score_distributions.png`: Histograms of RIS and Save Score distributions.
-  - `saves_vs_save_score.png`: Scatter plot of Saves vs. Save Score with RIS as hue/size.
-  - `ris_save_score_boxplot.png`: Box plots of RIS and Save Score by year.
-  - `bubble_ris_vs_save_score.png`: Bubble plot of RIS vs. Save Score, with bubble size as Saves.
+## 📊 Project Goals
 
-## Key Findings
+- Identify under- and over-valued closers beyond the traditional "save" stat.
+- Integrate advanced metrics from Statcast, FanGraphs, and Baseball-Reference.
+- Validate new metrics against actual WPA and test predictive power year-over-year.
 
-- **Save Score and RIS Metrics**:
-  - Save Score adjusts traditional saves for context (e.g., inherited runners, hitter quality, leverage), with a mean of 0.26 and standard deviation of 4.21.
-  - RIS combines skill metrics (SIERA, K%, BB%, leverage, xwOBA) to measure overall impact, with a mean of 43.72 and standard deviation of 13.67.
-- **Top Performers**:
-  - 2023: Devin Williams led relievers with an RIS of 79.19; Tanner Scott topped closers with a Save Score of 6.58.
-  - 2024: Mason Miller led relievers with an RIS of 91.20; Tanner Scott again led closers with a Save Score of 3.13.
-- **Misvaluation**:
-  - Under-Appreciated Closers: Tanner Scott (2023, 2024) and Griffin Jax (2024) excelled in Save Score despite fewer save opportunities.
-  - Over-Appreciated Closers: Emmanuel Clase (2023) and Clay Holmes (2024) had high saves but lower Save Scores, indicating over-reliance on traditional metrics.
-- **Validation**:
-  - RIS correlates strongly with WPA (0.569, p<0.0001), outperforming saves (0.516, p<0.0001).
-  - Predictive power (2023 to 2024): RIS shows a moderate correlation with future WPA (0.383, p=0.0589), while Save Score and saves have weaker predictive ability.
+---
 
-## Visualizations
+## 🛠️ Requirements
 
-The notebook generates several visualizations to illustrate reliever valuation:
-- **Scatter Plots**: Compare Saves vs. Save Score, with RIS as hue/size, highlighting misvaluation (e.g., Emmanuel Clase vs. Tanner Scott).
-- **Histograms**: Show distributions of RIS and Save Score, with means marked.
-- **Box Plots**: Display RIS and Save Score distributions by year (2023-2024).
-- **Bubble Plot**: Visualize RIS vs. Save Score, with bubble size representing saves.
-- **Radar Chart**: Profiles the top reliever’s performance across key metrics (SIERA, WPA, K%, RIS).
+Install the following packages before running:
 
-## Setup and Installation
+- `fuzzywuzzy`
+- `python-Levenshtein`
+- `pybaseball`
+- `scikit-learn`
+- `LinearRegression` (custom pip package)
+- `pandas`, `numpy`
 
-### Prerequisites
-- Python 3.7+
-- Google Colab (recommended) or a local Jupyter Notebook environment
-- Git (for cloning the repository)
+> Install using `pip install <package-name>`
 
-### Dependencies
-Install the required Python libraries using `pip`:
-```bash
-pip install pybaseball pandas numpy matplotlib seaborn scikit-learn fuzzywuzzy python-Levenshtein scipy
+---
+
+## 📦 Data Sources
+
+- Statcast (via `pybaseball`)
+- FanGraphs (relief pitcher stats, 2023–2024)
+- Baseball-Reference (custom CSV imports for reliever usage)
+
+---
+
+## 🧹 Workflow Summary
+
+### Step 1: Data Collection
+
+Collected 2023–2024 data using `pybaseball`, custom CSVs, and FanGraphs.
+
+### Step 2: Cleaning & Merging
+
+- Player name harmonization via `fuzzywuzzy`
+- Filtered for late-inning relievers (7th inning or later)
+- Merged all datasets on `Player` and `Year`
+
+### Step 3: Save Score
+
+A custom stat incorporating:
+- WPA per opportunity
+- Leverage index
+- Opponent quality (wOBA)
+- Inherited runners
+
+### Step 4: RIS (Reliever Impact Score)
+
+Optimized with `LinearRegression` using:
+- `SIERA` (inverted)
+- Inherited Runner Success Rate
+- `K%`, `BB%`
+- `xwOBA`
+- Leverage Index
+
+RIS scaled 0–100.
+
+### Step 5: Pitcher Rankings
+
+Ranked relievers by:
+- RIS (overall skill)
+- Save Score (context-based performance)
+- Misvaluation (Save Score vs. Save Opportunities)
+
+### Step 6: Validation
+
+- **RIS vs. WPA** correlation: 0.57
+- **Save Score vs. WPA**: 0.52
+- **2023 RIS → 2024 WPA**: 0.38
+
+---
+
+## 🔎 Key Insights
+
+- **Under-Appreciated**: Griffin Jax, Trevor Megill, Tanner Scott (elite Save Scores)
+- **Over-Appreciated**: Emmanuel Clase (low Save Score despite high SV total)
+- **RIS is more predictive of WPA** than SV or Save Score alone
+
+---
+
+## 👨‍💻 Author
+
+**Jared Markowitz**  
+Tulane University  
+Presenter at 2025 SABR Analytics Conference  
+Connect: [LinkedIn](https://www.linkedin.com/in/jared-markowitz-2563a8b8/)
+
+---
+
+## 🧠 Final Thoughts
+
+By integrating modern metrics and context, this project offers a framework to more accurately value relievers. RIS and Save Score can help front offices and fans alike better understand bullpen impact.
